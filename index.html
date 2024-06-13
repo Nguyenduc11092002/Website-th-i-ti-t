@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assests//css/style.css">
+    <link rel="icon" href="https://i.pinimg.com/originals/06/c4/f7/06c4f70ec5931e2342e703e8a3f0a253.png">
+    <title>Web Thời Tiết</title>
+</head>
+<body>
+    <!--Chia các phần trong trang web -->
+     <div class="card">
+        <div class="search">
+            <input type="text", placeholder="Nhập tên thành phố..." spellcheck="false">
+            <button><img src="/assests/img/search.png" alt="Icon search"></button>
+        </div>
+        <div class="error">
+            <p>Không tìm thấy địa điểm giống vậy</p>
+        </div>
+        <div class="weather">
+            <img src="/assests/img/clouds.png" alt="weather icon" class="weather-icon">
+            <h1 class="temp">35°C</h1>
+            <h2 class="city">Nam Định</h2>
+            <div class="details">
+                <!-- Humidity part -->
+                <div class="col">
+                    <img src="/assests/img/humidity.png" alt="icon độ ẩm">
+                    <div>
+                        <p class="humidity">50%</p>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+                <!-- Wind part -->
+                <div class="col">
+                    <img src="/assests/img/wind.png" alt="icon wind speed">
+                    <div>
+                        <p class="wind">15km/h</p>
+                        <p>Wind speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </div>
+
+
+     <script>
+        const apiKey = "5d42bf664d035536d7998d2f0f5396e6";
+        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?&units=metric&q="
+
+        // Handle seearch city including box and button
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon")
+
+        async function checkWeather (city){
+            const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+            try {
+                if(response.status == 404) {
+                    document.querySelector(".error").style.display = "block";
+                    document.querySelector(".weather").style.display = "none";
+                } else {
+                    var weather = await response.json();
+                    console.log(weather);
+
+                    document.querySelector(".city").innerHTML = weather.name;
+                    document.querySelector(".temp").innerHTML = Math.round(weather.main.temp) + "°C";
+                    document.querySelector(".humidity").innerHTML = weather.main.humidity + "%";
+                    document.querySelector(".wind").innerHTML = weather.wind.speed + "km/h";
+
+                    if(weather.weather[0].main == "Clouds"){
+                        weatherIcon.src = "/assests/img/clouds.png";
+                    } else if(weather.weather[0].main == "Clear") {
+                        weatherIcon.src = "/assests/img/clear.png";
+                    } else if(weather.weather[0].main == "Rain") {
+                        weatherIcon.src = "/assests/img/rain.png";
+                    } else if(weather.weather[0].main == "Drizzle") {
+                        weatherIcon.src = "/assests/img/drizzle.png";
+                    } else if(weather.weather[0].main == "Mist") {
+                        weatherIcon.src = "/assests/img/mist.png";
+                    }
+                    document.querySelector(".weather").style.display = "block";
+                    document.querySelector(".error").style.display = "none";
+                }
+            } catch (error) {
+                throw error;
+            }
+                 
+        }
+
+        searchBtn.addEventListener("click", ()=>{
+            checkWeather(searchBox.value);
+        })
+
+        searchBox.addEventListener("input", () => {
+            if (searchBox.value === "") {
+                document.querySelector(".weather").style.display = "none";
+                document.querySelector(".error").style.display = "none";
+            } else {
+                checkWeather(searchBox.value);
+            }
+        });
+     </script>
+</body>
+</html>
